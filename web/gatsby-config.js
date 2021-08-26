@@ -20,5 +20,7 @@ module.exports = {
         overlayDrafts: !isProd,
       },
     },
+    "gatsby-plugin-sass",
+    "gatsby-plugin-postcss",
   ],
 };
