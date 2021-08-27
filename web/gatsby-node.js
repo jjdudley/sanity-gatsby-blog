@@ -1,51 +1,39 @@
-const { isFuture } = require("date-fns");
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.org/docs/node-apis/
- */
-
-const { format } = require("date-fns");
-
-async function createBlogPostPages(graphql, actions) {
+async function createPages(graphql, actions) {
   const { createPage } = actions;
-  const result = await graphql(`
+
+  // Query Pages
+  const pagesQuery = await graphql(`
     {
-      allSanityPost(
-        filter: { slug: { current: { ne: null } }, publishedAt: { ne: null } }
-      ) {
+      allSanityPage {
         edges {
           node {
-            id
-            publishedAt
-            slug {
-              current
-            }
+            _rawPage(resolveReferences: { maxDepth: 9 })
           }
         }
       }
     }
   `);
 
-  if (result.errors) throw result.errors;
+  if (pagesQuery.errors) {
+    throw pagesQuery.errors;
+  }
 
-  const postEdges = (result.data.allSanityPost || {}).edges || [];
+  const pages = pagesQuery.data.allSanityPage.edges || [];
+  pages.forEach((edge) => {
+    const path = `/${
+      edge.node._rawPage.content.slug.current === "home"
+        ? ""
+        : edge.node._rawPage.content.slug.current
+    }`;
 
-  postEdges
-    .filter((edge) => !isFuture(new Date(edge.node.publishedAt)))
-    .forEach((edge) => {
-      const { id, slug = {}, publishedAt } = edge.node;
-      const dateSegment = format(new Date(publishedAt), "yyyy/MM");
-      const path = `/blog/${dateSegment}/${slug.current}/`;
-
-      createPage({
-        path,
-        component: require.resolve("./src/templates/blog-post.js"),
-        context: { id },
-      });
+    createPage({
+      path,
+      component: require.resolve("./src/templates/page.js"),
+      context: { ...edge.node._rawPage },
     });
+  });
 }
 
 exports.createPages = async ({ graphql, actions }) => {
-  await createBlogPostPages(graphql, actions);
+  await createPages(graphql, actions);
 };

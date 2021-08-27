@@ -10,7 +10,9 @@ const isProd = process.env.NODE_ENV === "production";
 module.exports = {
   plugins: [
     "gatsby-plugin-postcss",
+    "gatsby-plugin-image",
     "gatsby-plugin-react-helmet",
+    "gatsby-graphiql-explorer",
     {
       resolve: "gatsby-source-sanity",
       options: {
@@ -18,6 +20,12 @@ module.exports = {
         token: process.env.SANITY_READ_TOKEN,
         watchMode: !isProd,
         overlayDrafts: !isProd,
+      },
+    },
+    {
+      resolve: `gatsby-plugin-layout`,
+      options: {
+        layout: require.resolve(`./src/layouts/index.js`),
       },
     },
     "gatsby-plugin-sass",

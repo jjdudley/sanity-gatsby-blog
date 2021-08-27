@@ -1,7 +1,9 @@
 import S from "@sanity/desk-tool/structure-builder";
-import { MdSettings } from "react-icons/md";
-import { MdPerson, MdDescription, MdLocalOffer } from "react-icons/md";
+
 import IframePreview from "../previews/IframePreview";
+import { SettingsStructure } from "./settingsStructure";
+import { BlogStructure } from "./blogStructure";
+import { MdInsertDriveFile } from "react-icons/md";
 
 // Web preview configuration
 const remoteURL = "https://sanity-gatsby-blog-web-fpn4yxqj.netlify.app";
@@ -43,38 +45,17 @@ export default () =>
   S.list()
     .title("Content")
     .items([
+      SettingsStructure,
       S.listItem()
-        .title("Settings")
-        .icon(MdSettings)
+        .title("Pages")
+        .icon(MdInsertDriveFile)
         .child(
-          S.editor()
-            .id("siteSettings")
-            .schemaType("siteSettings")
-            .documentId("siteSettings")
+          S.documentTypeList("page")
+            .title("Pages")
+            .menuItems(S.documentTypeList("page").getMenuItems())
+            .filter("_type == $type")
+            .params({ type: "page" })
+            .child((documentId) => S.document().documentId(documentId))
         ),
-      S.divider(),
-      S.listItem()
-        .title("Blog posts")
-        .icon(MdDescription)
-        .schemaType("post")
-        .child(S.documentTypeList("post").title("Blog posts")),
-      S.listItem()
-        .title("Authors")
-        .icon(MdPerson)
-        .schemaType("author")
-        .child(S.documentTypeList("author").title("Authors")),
-      S.listItem()
-        .title("Categories")
-        .icon(MdLocalOffer)
-        .schemaType("category")
-        .child(S.documentTypeList("category").title("Categories")),
-      // `S.documentTypeListItems()` returns an array of all the document types
-      // defined in schema.js. We filter out those that we have
-      // defined the structure above.
-      ...S.documentTypeListItems().filter(
-        (listItem) =>
-          !["category", "author", "post", "siteSettings"].includes(
-            listItem.getId()
-          )
-      ),
+      BlogStructure,
     ]);
