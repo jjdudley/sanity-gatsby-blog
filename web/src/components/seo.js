@@ -1,5 +1,5 @@
 import React from "react";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet";
 import { GlobalSeoQuery } from "../static-queries/siteGlobalQuery.js";
 
 export const Seo = ({ metaInfo, fallbackImage, location }) => {
